@@ -6,21 +6,18 @@ using System.Threading.Tasks;
 
 namespace Removing_Branching
 {
-
     class Account
     {
         public decimal Balance { get; private set; }
         private bool IsVerified { get; set; }
         private bool IsClosed { get; set; }
-        private bool IsFrozen { get; set; }
-
-        private Action OnUnFreeze { get; }
-
+                        
+        private IFreezable Freezable { get; set; }
         public Account(Action onUnFreeze)
         {
-            this.OnUnFreeze = onUnFreeze;
+            this.Freezable = new Active(onUnFreeze);            
         }
-        
+
         /// <summary>
         /// Question: how many ways this method can be called?
         /// Ans: Two ways
@@ -34,6 +31,8 @@ namespace Removing_Branching
         {
             if (this.IsClosed)
                 return;//or do something else
+
+            this.Freezable = this.Freezable.Deposit();
 
             Balance += amount;
         }
@@ -57,6 +56,8 @@ namespace Removing_Branching
             if (this.IsClosed)
                 return; // or do something else
 
+            this.Freezable = this.Freezable.Withdraw();
+
             //withdraw money
             Balance -= amount;
         }
@@ -70,20 +71,14 @@ namespace Removing_Branching
         {
             this.IsClosed = true;
         }
-        
         public void Freeze()
         {
             if (this.IsClosed)
                 return;//Account must not be closed
             if (!this.IsVerified)
-                return;//Account must be verified
-
-            this.IsFrozen = true;
-        }
+                return;//Account must be verified         
+            this.Freezable = this.Freezable.Freeze();
+        }        
     }
 }
 
-/*
- Account will be unfrozen automatically on deposit or withdraw.
- Unfreezing the account triggers a custom action.
-*/
