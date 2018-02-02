@@ -9,19 +9,25 @@ namespace Removing_Branching
         {
             this.OnUnFreeze = onUnFreeze;
         }
-        public IFreezable Deposit()
+        public IFreezable Deposit(Action addToBalance)
         {
             this.OnUnFreeze();
+            addToBalance();
             return new Active(OnUnFreeze);
         }
         
-        public IFreezable Withdraw()
+        public IFreezable Withdraw(Action subtractFromBalance)
         {
             this.OnUnFreeze();
+            subtractFromBalance();
             return new Active(OnUnFreeze);
         }
 
-        public IFreezable Freeze() => this;       
+        public IFreezable Freeze() => this;
+
+        public IFreezable Close() => new Closed();
+
+        public IFreezable HolderVerified() => this;        
     }
 }
 
