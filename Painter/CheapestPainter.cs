@@ -8,7 +8,17 @@ namespace Painter
 {
     class CheapestPainter
     {
-        public static IPainter FindCheapestPrinter(double sqMeters,IEnumerable<IPainter> painters)
+
+        public static IPainter FindCheapestPrinter_v2(double sqMeters, IEnumerable<IPainter> painters)
+        {
+            //Worst Implemenation
+            return
+                painters
+                .Where(w=>w.IsAvailable)
+                .OrderBy(p=>p.EstimateCost(sqMeters))
+                .FirstOrDefault();
+        }
+        public static IPainter FindCheapestPrinter_v1(double sqMeters,IEnumerable<IPainter> painters)
         {
             decimal bestPrice = 0;
             IPainter cheapest = null;
