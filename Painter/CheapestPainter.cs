@@ -8,11 +8,35 @@ namespace Painter
 {
     public static class EnumerableExtensions
     {
+        /// <summary>
+        /// It is a good generic method, but performance can be impoved by remmbering the result of previous result
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TKey"></typeparam>
+        /// <param name="sequence"></param>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        //public static T WithMinimum<T, TKey>(this IEnumerable<T> sequence, Func<T, TKey> predicate)
+        //        where T : class
+        //        where TKey : IComparable<TKey>
+        //        => sequence.Aggregate((T)null, (best, cur) => best == null || predicate(cur).CompareTo(predicate(best))<0 ?
+        //            best : cur);
+
+        /// <summary>
+        /// Perfect solution as per my understanding, It is complicated but, it is infrastructural code
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TKey"></typeparam>
+        /// <param name="sequence"></param>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
         public static T WithMinimum<T, TKey>(this IEnumerable<T> sequence, Func<T, TKey> predicate)
                 where T : class
                 where TKey : IComparable<TKey>
-                => sequence.Aggregate((T)null, (best, cur) => best == null || predicate(cur).CompareTo(predicate(best))<0 ?
-                    best : cur);
+                => sequence
+                    .Select(obj=>Tuple.Create(obj,predicate(obj)))
+                    .Aggregate((Tuple<T,TKey>)null, (best, cur) => best == null || cur.Item2.CompareTo(best.Item2) < 0 ? best : cur)
+                    .Item1;
     }
     class CheapestPainter
     {
